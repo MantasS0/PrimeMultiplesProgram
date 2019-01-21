@@ -74,7 +74,7 @@ public class Controller {
     }
 
     @FXML
-    public void onButtonClicked(ActionEvent e) throws InterruptedException {
+    public void onButtonClicked(ActionEvent e){
         if (e.getSource().equals(startCalcButton)) {
             System.out.println("Start");
             ((CalculationService) service).setFirstNumber(dumbCheck(firstNumberTextField.getText()));
