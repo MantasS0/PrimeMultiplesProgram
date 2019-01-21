@@ -1,20 +1,17 @@
 package com.mantassasnauskas.program;
 
-import com.mantassasnauskas.program.entryModel.EntryData;
-import com.mantassasnauskas.program.entryModel.FieldEntry;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-
-import java.time.LocalDateTime;
+import javafx.scene.control.*;
+import javafx.stage.StageStyle;
 
 
 public class Controller {
-    @FXML
-    public static Label informationLabel;
+
     @FXML
     private TextField firstNumberTextField;
     @FXML
@@ -27,23 +24,77 @@ public class Controller {
     private Button startCalcButton;
     @FXML
     private Button exitButton;
+    @FXML
+    private Label informationLabel;
+    @FXML
+    private ProgressBar progressBar;
 
-//    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private Service<ObservableList<String>> service;
 
 
     @FXML
     public void initialize() {
         startCalcButton.setDisable(true);
+
+        service = new CalculationService();
+
+        progressBar.progressProperty().bind(service.progressProperty());
+        informationLabel.textProperty().bind(service.messageProperty());
+        progressBar.visibleProperty().bind(service.runningProperty());
+        informationLabel.visibleProperty().bind(service.runningProperty());
+
+        service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                Alert alert = new Alert(Alert.AlertType.NONE);
+
+                if (service.getValue().isEmpty()) {
+                    alert.initStyle(StageStyle.UTILITY);
+                    alert.setTitle("Failed!");
+                    alert.setContentText("Įvesti skaičiai neatitinka reikalavimų.");
+                    alert.getButtonTypes().add(ButtonType.OK);
+                    alert.showAndWait();
+                    if (alert.getResult() == ButtonType.OK) {
+                        service.cancel();
+                        service.reset();
+                    }
+                } else {
+                    alert.initStyle(StageStyle.UTILITY);
+                    alert.setTitle("Success!");
+                    alert.setContentText("Skaidymas baigtas. Rezultatai faile rezultatai.txt");
+                    alert.getButtonTypes().add(ButtonType.OK);
+                    alert.showAndWait();
+                    if (alert.getResult() == ButtonType.OK) {
+                        service.cancel();
+                        service.reset();
+                    }
+                }
+            }
+        });
     }
 
     @FXML
     public void onButtonClicked(ActionEvent e) throws InterruptedException {
         if (e.getSource().equals(startCalcButton)) {
             System.out.println("Start");
-            processFieldEntry();
-                EntryData.getInstance().calculatePrimeIntegers(true);
+            ((CalculationService) service).setFirstNumber(dumbCheck(firstNumberTextField.getText()));
+            ((CalculationService) service).setLastNumber(dumbCheck(lastNumberTextField.getText()));
+            ((CalculationService) service).setIntevalNumber(dumbCheck(intervalNumberTextField.getText()));
+
+
+            if (service.getState() == Service.State.SUCCEEDED || service.getState() == Service.State.CANCELLED) {
+                service.reset();
+                service.start();
+            } else if (service.getState() == Service.State.RUNNING || service.getState() == Service.State.FAILED) {
+                service.cancel();
+                service.reset();
+                service.start();
+            } else if (service.getState() == Service.State.READY) {
+                service.start();
+            }
+
+
         } else if (e.getSource().equals(exitButton)) {
-                EntryData.getInstance().calculatePrimeIntegers(false);
             System.out.println("Exit");
             System.exit(0);
         }
@@ -67,31 +118,11 @@ public class Controller {
         startCalcButton.setDisable(disableStartButton);
     }
 
-
-    public FieldEntry processFieldEntry(){
-        String firstNumber = dumbCheck(firstNumberTextField.getText().trim());
-        String lastNumber = dumbCheck(lastNumberTextField.getText().trim());
-        String intervalNumber = dumbCheck(intervalNumberTextField.getText().trim());
-        LocalDateTime currentDate = LocalDateTime.now();
-        if (firstNumber.equals("-1") || lastNumber.equals("-1") || intervalNumber.equals("-1")){
-            System.out.println("-1 gautas processFieldEntry metode");
-            FieldEntry newFieldEntry = new FieldEntry(100,200,26,currentDate);
-            EntryData.getInstance().addFieldEntry(newFieldEntry);
-            return newFieldEntry;
-
-        }else {
-            FieldEntry newFieldEntry = new FieldEntry(Integer.parseInt(firstNumber),Integer.parseInt(lastNumber),
-                    Integer.parseInt(intervalNumber),currentDate);
-            EntryData.getInstance().addFieldEntry(newFieldEntry);
-            return newFieldEntry;
+    private Integer dumbCheck(String string) {
+        if (string.matches("^[0-9]+$") && string.charAt(0) != '0' && Integer.parseInt(string) >= 1) {
+            return Integer.parseInt(string);
         }
-    }
-
-    private String dumbCheck (String string){
-        if (string.matches("^[0-9]+$") && string.charAt(0) !='0' && Integer.parseInt(string) >= 2){
-            return string;
-        }
-        return "-1";
+        return -1;
     }
 
 }
