@@ -9,17 +9,17 @@
 
 
     <TextField fx:id="firstNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="0"
-    promptText="Iveskite sveiką skaičių" prefWidth="140"
-    onKeyReleased="#handleKeyReleased"/>
+               promptText="Iveskite sveiką skaičių" prefWidth="140"
+               onKeyReleased="#handleKeyReleased"/>
     <TextField fx:id="lastNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="1"
-    promptText="Iveskite sveiką skaičių" prefWidth="140"
-    onKeyReleased="#handleKeyReleased"/>
+               promptText="Iveskite sveiką skaičių" prefWidth="140"
+               onKeyReleased="#handleKeyReleased"/>
     <TextField fx:id="intervalNumberTextField" GridPane.rowIndex="1" GridPane.columnIndex="2"
-    promptText="Iveskite sveiką skaičių" prefWidth="140"
-    onKeyReleased="#handleKeyReleased"/>
+               promptText="Iveskite sveiką skaičių" prefWidth="140"
+               onKeyReleased="#handleKeyReleased"/>
 
     <CheckBox fx:id="clearFieldsCheckBox" text="Išvalyti įvesties laukelius pradėjus skaičiuoti"
-    GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
+              GridPane.rowIndex="2" GridPane.columnIndex="0" GridPane.columnSpan="3"/>
 
     <HBox spacing="10" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3" alignment="CENTER">
         <Label fx:id="informationLabel" GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="3"
@@ -28,6 +28,9 @@
 
     <ProgressBar fx:id="progressBar" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="3"
                  prefWidth="445"/>
+    <HBox spacing="10" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="3" alignment="CENTER">
+        <Label fx:id="progressBarLabel" textAlignment="CENTER"/>
+    </HBox>
 
     <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnIndex="0" GridPane.columnSpan="3" alignment="CENTER_RIGHT">
         <Button fx:id="startCalcButton" text="Pradėti" prefWidth="90" onAction="#onButtonClicked"/>

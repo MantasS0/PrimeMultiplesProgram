@@ -1,5 +1,6 @@
 package com.mantassasnauskas.program;
 
+import com.sun.javafx.binding.StringFormatter;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
@@ -28,6 +29,8 @@ public class Controller {
     private Label informationLabel;
     @FXML
     private ProgressBar progressBar;
+    @FXML
+    private Label progressBarLabel;
 
     private Service<ObservableList<String>> service;
 
@@ -36,11 +39,13 @@ public class Controller {
     public void initialize() {
         startCalcButton.setDisable(true);
 
-        service = new CalculationService();
 
+        service = new CalculationService();
         progressBar.progressProperty().bind(service.progressProperty());
+        progressBarLabel.textProperty().bind(StringFormatter.format("%.4s%%",progressBar.progressProperty().multiply(100).asString()));
         informationLabel.textProperty().bind(service.messageProperty());
         progressBar.visibleProperty().bind(service.runningProperty());
+        progressBarLabel.visibleProperty().bind(service.runningProperty());
         informationLabel.visibleProperty().bind(service.runningProperty());
 
         service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
