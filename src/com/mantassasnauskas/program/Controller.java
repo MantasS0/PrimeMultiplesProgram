@@ -42,7 +42,7 @@ public class Controller {
 
         service = new CalculationService();
         progressBar.progressProperty().bind(service.progressProperty());
-        progressBarLabel.textProperty().bind(StringFormatter.format("%.4s%%",progressBar.progressProperty().multiply(100).asString()));
+        progressBarLabel.textProperty().bind(StringFormatter.format("%.0f%%",progressBar.progressProperty().multiply(100)));
         informationLabel.textProperty().bind(service.messageProperty());
         progressBar.visibleProperty().bind(service.runningProperty());
         progressBarLabel.visibleProperty().bind(service.runningProperty());
