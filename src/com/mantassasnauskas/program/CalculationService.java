@@ -77,6 +77,7 @@ public class CalculationService extends Service<ObservableList<String>> {
                 LocalDateTime currentDate = LocalDateTime.now();
 
                 ObservableList<String> numbers = FXCollections.observableArrayList();
+                boolean interupted = false;
 
                 if (firstNumber == -1 || lastNumber == -1 || intervalNumber == -1 || firstNumber > lastNumber) {
                     System.out.println("Įvestas netinkasmas skaičius.");
@@ -98,7 +99,6 @@ public class CalculationService extends Service<ObservableList<String>> {
                         }
 
                         for (int i = 0; i < allNumbers.size(); i++) {
-
                             int currentNumberBeingProcessed = allNumbers.get(i);
 
                             numbers.add(Integer.toString(currentNumberBeingProcessed));
@@ -123,12 +123,15 @@ public class CalculationService extends Service<ObservableList<String>> {
 
                         }
                     } catch (Exception e) {
+                        interupted = true;
                         System.out.println(e);
 
                     } finally {
+                        if (interupted){
+                            return numbers;
+                        }
                         String stringDone = LocalDateTime.now().format(formatter) + "\t\tSkaičiavimo pabaiga.";
                         writeFile(stringDone);
-
                     }
                     return numbers;
 
@@ -141,6 +144,10 @@ public class CalculationService extends Service<ObservableList<String>> {
     private List<Integer> primeFactors(int numbers) {
         int n = numbers;
         List<Integer> factors = new ArrayList<Integer>();
+        if (numbers == 1){
+            factors.add(1);
+            return factors;
+        }
         for (int i = 2; i <= n / i; i++) {
             while (n % i == 0) {
                 factors.add(i);
