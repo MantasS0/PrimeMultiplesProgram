@@ -1,7 +1,6 @@
 package com.mantassasnauskas.program;
 
 import com.sun.javafx.binding.StringFormatter;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -32,13 +31,12 @@ public class Controller {
     @FXML
     private Label progressBarLabel;
 
-    private Service<ObservableList<String>> service;
+    private Service<Boolean> service;
 
 
     @FXML
     public void initialize() {
         startCalcButton.setDisable(true);
-
 
         service = new CalculationService();
         progressBar.progressProperty().bind(service.progressProperty());
@@ -53,7 +51,7 @@ public class Controller {
             public void handle(WorkerStateEvent event) {
                 Alert alert = new Alert(Alert.AlertType.NONE);
 
-                if (service.getValue().isEmpty()) {
+                if (!service.getValue()) {
                     alert.initStyle(StageStyle.UTILITY);
                     alert.setTitle("Failed!");
                     alert.setContentText("Įvesti skaičiai neatitinka reikalavimų.");
@@ -81,6 +79,7 @@ public class Controller {
     @FXML
     public void onButtonClicked(ActionEvent e){
         if (e.getSource().equals(startCalcButton)) {
+            try{
             System.out.println("Start");
             ((CalculationService) service).setFirstNumber(dumbCheck(firstNumberTextField.getText()));
             ((CalculationService) service).setLastNumber(dumbCheck(lastNumberTextField.getText()));
@@ -96,19 +95,20 @@ public class Controller {
                 service.start();
             } else if (service.getState() == Service.State.READY) {
                 service.start();
+            }}catch (Exception ex){
+                System.out.println(ex);
+            }finally {
+                if (clearFieldsCheckBox.isSelected() && e.getSource().equals(startCalcButton)) {
+                    firstNumberTextField.clear();
+                    lastNumberTextField.clear();
+                    intervalNumberTextField.clear();
+                    startCalcButton.setDisable(true);
+                }
             }
-
 
         } else if (e.getSource().equals(exitButton)) {
             System.out.println("Exit");
             System.exit(0);
-        }
-
-        if (clearFieldsCheckBox.isSelected() && e.getSource().equals(startCalcButton)) {
-            firstNumberTextField.clear();
-            lastNumberTextField.clear();
-            intervalNumberTextField.clear();
-            initialize();
         }
     }
 

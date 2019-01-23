@@ -2,8 +2,6 @@ package com.mantassasnauskas.program;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class CalculationService extends Service<ObservableList<String>> {
+public class CalculationService extends Service<Boolean> {
 
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd\tHH:mm:ss:SSS");
 
@@ -60,29 +58,27 @@ public class CalculationService extends Service<ObservableList<String>> {
     }
 
     @Override
-    protected Task<ObservableList<String>> createTask() {
+    protected Task<Boolean> createTask() {
 
         final Integer _firstNumber = getFirstNumber();
         final Integer _lastNumber = getLastNumber();
         final Integer _intervalNumber = getIntevalNumber();
 
-        return new Task<ObservableList<String>>() {
+        return new Task<Boolean>() {
 
             @Override
-            protected ObservableList<String> call() throws Exception {
+            protected Boolean call() throws Exception {
 
                 int firstNumber = new Integer(_firstNumber);
                 int lastNumber = new Integer(_lastNumber);
                 int intervalNumber = new Integer(_intervalNumber);
                 LocalDateTime currentDate = LocalDateTime.now();
 
-                ObservableList<String> numbers = FXCollections.observableArrayList();
-                boolean interupted = false;
+                boolean interrupted = false;
 
                 if (firstNumber == -1 || lastNumber == -1 || intervalNumber == -1 || firstNumber > lastNumber) {
                     System.out.println("Įvestas netinkasmas skaičius.");
-                    numbers.clear();
-                    return numbers;
+                    return false;
 
                 } else {
 
@@ -101,7 +97,6 @@ public class CalculationService extends Service<ObservableList<String>> {
                         for (int i = 0; i < allNumbers.size(); i++) {
                             int currentNumberBeingProcessed = allNumbers.get(i);
 
-                            numbers.add(Integer.toString(currentNumberBeingProcessed));
                             updateMessage("Calculating number: " + currentNumberBeingProcessed);
 
                             List<Integer> currentFactors = primeFactors(currentNumberBeingProcessed);
@@ -123,17 +118,17 @@ public class CalculationService extends Service<ObservableList<String>> {
 
                         }
                     } catch (Exception e) {
-                        interupted = true;
+                        interrupted = true;
                         System.out.println(e);
 
                     } finally {
-                        if (interupted){
-                            return numbers;
+                        if (interrupted){
+                            return false;
                         }
                         String stringDone = LocalDateTime.now().format(formatter) + "\t\tSkaičiavimo pabaiga.";
                         writeFile(stringDone);
                     }
-                    return numbers;
+                    return true;
 
                 }
 
